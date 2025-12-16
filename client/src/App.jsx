@@ -3,6 +3,9 @@ import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import Create from "./pages/Create";
+import Home from "./pages/Home";
+import Single from "./pages/Single";
+import Edit from "./pages/Edit";
 
 function App() {
   const user = JSON.parse(localStorage.getItem("user"));
@@ -35,17 +38,14 @@ function App() {
       </nav>
 
       <Routes>
-        <Route path="/" element={
-            <div style={{textAlign: "center", marginTop: "50px"}}>
-                <h1>Welcome to CodeStash</h1>
-                {user ? <p>You are logged in!</p> : <p>Please login to manage your snippets.</p>}
-            </div>
-        } />
+        <Route path="/" element={<Home />} />
         <Route path="/register" element={user ? <div style={{textAlign:"center"}}>Already Logged In</div> : <Register />} />
         <Route path="/login" element={user ? <div style={{textAlign:"center"}}>Already Logged In</div> : <Login />} />
+        <Route path="/snippet/:id" element={<Single />} />
 
 
         <Route path="/create" element={user ? <Create /> : <Login />} />
+        <Route path="/edit/:id" element={<Edit />} />
       </Routes>
     </BrowserRouter>
   );

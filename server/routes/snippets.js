@@ -23,6 +23,27 @@ router.get('/:userId', async (req, res) => {
     res.status(500).json(err);
   }
 });
+// 3. GET ONE SPECIFIC SNIPPET (Add this new route)
+router.get('/find/:id', async (req, res) => {
+  try {
+    const snippet = await Snippet.findById(req.params.id);
+    res.status(200).json(snippet);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+router.put('/:id', async (req, res) => {
+  try {
+    const updatedSnippet = await Snippet.findByIdAndUpdate(
+      req.params.id,
+      { $set: req.body }, // Update with new data sent from frontend
+      { new: true }       // Return the updated version, not the old one
+    );
+    res.status(200).json(updatedSnippet);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
 
 // 3. DELETE A SNIPPET
 router.delete('/:id', async (req, res) => {
