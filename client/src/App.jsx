@@ -1,22 +1,53 @@
 // client/src/App.jsx
-import { useEffect, useState } from 'react';
-import axios from 'axios';
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import Register from "./pages/Register";
+import Login from "./pages/Login";
+import Create from "./pages/Create";
 
 function App() {
-  const [message, setMessage] = useState('');
-
-  useEffect(() => {
-    // Try to fetch data from our new backend
-    axios.get('http://localhost:5000/')
-      .then(response => setMessage(response.data))
-      .catch(error => console.error("Error fetching data:", error));
-  }, []);
-
+  const user = JSON.parse(localStorage.getItem("user"));
+  const handleLogout = () =>{
+    localStorage.removeItem("user");
+    window.location.reload();
+  }
   return (
-    <div style={{ textAlign: 'center', marginTop: '50px' }}>
-      <h1>CodeStash (MERN)</h1>
-      <p>Backend Status: {message ? <span style={{color: 'green'}}>{message}</span> : <span style={{color: 'red'}}>Connecting...</span>}</p>
-    </div>
+    <BrowserRouter>
+      {/* Navigation Bar */}
+      <nav style={{padding: "20px", backgroundColor: "#333", color: "white", marginBottom: "20px"}}>
+        <Link to="/" style={{marginRight:"20px", color:"white", textDecoration:"none", fontWeight:"bold"}}>CodeStash</Link>
+        <div>
+            {/* If user is logged in, show their name and Logout. If not, show Register/Login */}
+            {user ? (
+              <>
+                <Link to="/create" style={{marginRight: "20px", color: "white", backgroundColor: "green", padding: "10px", borderRadius: "5px", textDecoration: "none"}}>+ New Snippet</Link>
+
+                <span style={{marginRight: "20px", color: "lightgreen"}}>Hello, {user.firstName}</span>
+                <span onClick={handleLogout} style={{cursor: "pointer", color: "lightcoral"}}>Logout</span>
+              </>
+            ) : (
+              <>
+                <Link to="/login" style={{marginRight:"20px", color:"white", textDecoration:"none"}}>Login</Link>
+                <Link to="/register" style={{color:"white", textDecoration:"none"}}>Register</Link>
+              </>
+            )}
+        </div>
+
+      </nav>
+
+      <Routes>
+        <Route path="/" element={
+            <div style={{textAlign: "center", marginTop: "50px"}}>
+                <h1>Welcome to CodeStash</h1>
+                {user ? <p>You are logged in!</p> : <p>Please login to manage your snippets.</p>}
+            </div>
+        } />
+        <Route path="/register" element={user ? <div style={{textAlign:"center"}}>Already Logged In</div> : <Register />} />
+        <Route path="/login" element={user ? <div style={{textAlign:"center"}}>Already Logged In</div> : <Login />} />
+
+
+        <Route path="/create" element={user ? <Create /> : <Login />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
