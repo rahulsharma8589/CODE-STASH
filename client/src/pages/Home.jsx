@@ -7,9 +7,7 @@ export default function Home() {
   const [query, setQuery] = useState(""); 
   const user = JSON.parse(localStorage.getItem("user"));
 
-  // ---------------------------------------------------------
-  // 1. DASHBOARD LOGIC (Only runs if user is logged in)
-  // ---------------------------------------------------------
+  // --- 1. DASHBOARD LOGIC (Only runs if user is logged in) ---
   useEffect(() => {
     const fetchSnippets = async () => {
       if (user) {
@@ -30,7 +28,7 @@ export default function Home() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this project?")) return;
+    if (!window.confirm("Delete this project?")) return;
     try {
       await api.delete("/snippets/" + id);
       setSnippets(snippets.filter((s) => s._id !== id));
@@ -53,9 +51,7 @@ export default function Home() {
     return html;
   };
 
-  // ---------------------------------------------------------
-  // 2. LANDING PAGE (Shown when NO user is logged in)
-  // ---------------------------------------------------------
+  // --- 2. LANDING PAGE (Shown when NO user is logged in) ---
   if (!user) {
     return (
         <div style={{ minHeight: "100vh", backgroundColor: "#0f0f0f", color: "white", fontFamily: "'Segoe UI', sans-serif" }}>
@@ -75,7 +71,7 @@ export default function Home() {
                     CodeStash
                 </h1>
                 <p style={{ fontSize: "1.2rem", color: "#aaa", maxWidth: "600px", marginBottom: "30px", lineHeight: "1.6" }}>
-                    An online code editor for building, testing, and sharing HTML, CSS, and JS projects instantly in your browser.
+                    The ultimate online code editor. Build, test, and share your HTML, CSS, and JS projects instantly.
                 </p>
                 <div style={{ display: "flex", gap: "20px" }}>
                     <Link to="/login">
@@ -85,7 +81,7 @@ export default function Home() {
                     </Link>
                     <Link to="/register">
                         <button style={{ padding: "12px 30px", fontSize: "16px", backgroundColor: "transparent", color: "#007acc", border: "2px solid #007acc", borderRadius: "6px", cursor: "pointer", fontWeight: "bold" }}>
-                            Get Started
+                            Register
                         </button>
                     </Link>
                 </div>
@@ -96,42 +92,36 @@ export default function Home() {
                 <h2 style={{ textAlign: "center", marginBottom: "50px", fontSize: "2rem" }}>How It Works</h2>
                 
                 <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "40px" }}>
-                    
                     {/* STEP 1 */}
                     <div style={{ flex: "1", minWidth: "250px", backgroundColor: "#1e1e1e", padding: "30px", borderRadius: "10px", border: "1px solid #333" }}>
                         <div style={{ fontSize: "40px", marginBottom: "15px" }}>📂</div>
                         <h3 style={{ color: "#007acc" }}>1. Create Project</h3>
-                        <p style={{ color: "#ccc", lineHeight: "1.5" }}>Start a new project with a single click. We set up the basic HTML, CSS, and JS files for you automatically.</p>
+                        <p style={{ color: "#ccc", lineHeight: "1.5" }}>Start a new project with a single click. We set up the environment for you.</p>
                     </div>
-
                     {/* STEP 2 */}
                     <div style={{ flex: "1", minWidth: "250px", backgroundColor: "#1e1e1e", padding: "30px", borderRadius: "10px", border: "1px solid #333" }}>
                         <div style={{ fontSize: "40px", marginBottom: "15px" }}>✍️</div>
                         <h3 style={{ color: "#e6a23c" }}>2. Write Code</h3>
-                        <p style={{ color: "#ccc", lineHeight: "1.5" }}>Use our powerful code editor with syntax highlighting. Edit multiple files side-by-side.</p>
+                        <p style={{ color: "#ccc", lineHeight: "1.5" }}>Use our powerful editor with syntax highlighting to write your HTML, CSS, and JS.</p>
                     </div>
-
                     {/* STEP 3 */}
                     <div style={{ flex: "1", minWidth: "250px", backgroundColor: "#1e1e1e", padding: "30px", borderRadius: "10px", border: "1px solid #333" }}>
                         <div style={{ fontSize: "40px", marginBottom: "15px" }}>🚀</div>
-                        <h3 style={{ color: "#28a745" }}>3. Live Preview</h3>
-                        <p style={{ color: "#ccc", lineHeight: "1.5" }}>See your changes instantly in the built-in browser preview. No refresh needed.</p>
+                        <h3 style={{ color: "#28a745" }}>3. See Results</h3>
+                        <p style={{ color: "#ccc", lineHeight: "1.5" }}>Watch your code come to life instantly in the live preview window.</p>
                     </div>
-
                 </div>
             </section>
 
             {/* FOOTER */}
             <footer style={{ textAlign: "center", padding: "40px", color: "#555", fontSize: "14px", borderTop: "1px solid #222", marginTop: "40px" }}>
-                &copy; {new Date().getFullYear()} CodeStash. Build something amazing.
+                &copy; 2024 CodeStash. All rights reserved.
             </footer>
         </div>
     );
   }
 
-  // ---------------------------------------------------------
-  // 3. DASHBOARD UI (Shown when USER IS LOGGED IN)
-  // ---------------------------------------------------------
+  // --- 3. DASHBOARD UI (Shown when USER IS LOGGED IN) ---
   return (
     <div style={{ minHeight: "100vh", backgroundColor: "#1e1e1e", color: "#e0e0e0", fontFamily: "'Segoe UI', sans-serif" }}>
       

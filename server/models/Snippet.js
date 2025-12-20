@@ -2,26 +2,20 @@
 const mongoose = require('mongoose');
 
 const SnippetSchema = new mongoose.Schema({
-  userId: {
-    type: String,
-    required: true, // We need to know WHO created the snippet
-  },
-  title: {
-    type: String,
-    required: true,
-  },
-  description: {
-    type: String,
-    default: "",
-  },
-  code: {
-    type: String,
-    required: true, // The actual code
-  },
-  language: {
-    type: String,
-    default: "javascript", // e.g., python, java, html
-  },
+  userId: { type: String, required: true },
+  title: { type: String, required: true },
+  
+  // THE FILE SYSTEM
+  // Instead of fixed html/css/js, we store a list of files
+  files: [
+    {
+      name: { type: String, required: true }, // e.g., "script.js" or "styles/main.css"
+      language: { type: String, required: true }, // "javascript", "css", "html"
+      value: { type: String, default: "" } // The actual code
+    }
+  ],
+  
+  isPublic: { type: Boolean, default: true },
 }, { timestamps: true });
 
 module.exports = mongoose.model('Snippet', SnippetSchema);

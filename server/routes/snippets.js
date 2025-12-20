@@ -36,8 +36,8 @@ router.put('/:id', async (req, res) => {
   try {
     const updatedSnippet = await Snippet.findByIdAndUpdate(
       req.params.id,
-      { $set: req.body }, // Update with new data sent from frontend
-      { new: true }       // Return the updated version, not the old one
+      { $set: req.body }, 
+      { new: true }
     );
     res.status(200).json(updatedSnippet);
   } catch (err) {
