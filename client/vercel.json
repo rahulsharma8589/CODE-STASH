@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://code-stash-api.onrender.com"
+      "destination": "https://code-stash-api.onrender.com/api/$1"
     }
   ]
 }
