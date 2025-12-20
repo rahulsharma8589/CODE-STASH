@@ -11,7 +11,7 @@ dotenv.config();
 
 const app = express();
 // const PORT = process.env.PORT || 5000;
-const PORT = 8800;
+// const PORT = 8800;
 
 // Middleware
 app.use(cors({
@@ -33,6 +33,9 @@ app.get('/', (req, res) => {
   res.send('CodeStash API is running!');
 });
 
+// Use the Port Render assigns, OR use 8800 if on Localhost
+const PORT = process.env.PORT || 8800;
+
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+    console.log(`Server running on port ${PORT}`);
 });
