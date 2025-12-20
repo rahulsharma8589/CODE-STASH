@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { buildFileTree } from '../utils/fileSystem';
+import { buildFileTree } from '../utils/filesystem';
 
 // --- ICONS ---
 const NewFileIcon = () => (<svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M6 1H3C2.44772 1 2 1.44772 2 2V13C2 13.5523 2.44772 14 3 14H12C12.5523 14 13 13.5523 13 13V6L8 1H6Z" stroke="#cccccc"/><path d="M7.5 6V9M9 7.5H6" stroke="#cccccc"/></svg>);
