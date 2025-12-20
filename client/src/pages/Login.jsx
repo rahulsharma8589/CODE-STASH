@@ -27,7 +27,7 @@ export default function Login() {
       localStorage.setItem("user", JSON.stringify(res.data));
       
       // 2. FORCE RELOAD to Home Page (Fixes the Navbar issue)
-      window.location.href = "/"; 
+      window.location.replace("/")
       
     } catch (err) {
       setError(true);
