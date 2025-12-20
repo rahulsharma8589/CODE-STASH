@@ -1,108 +1,182 @@
-// client/src/pages/Home.jsx
 import { useEffect, useState } from 'react';
-import axios from 'axios';
 import { Link } from 'react-router-dom';
+import { api } from '../api'; 
 
 export default function Home() {
   const [snippets, setSnippets] = useState([]);
-  
-  // Get logged in user
+  const [query, setQuery] = useState(""); 
   const user = JSON.parse(localStorage.getItem("user"));
 
+  // ---------------------------------------------------------
+  // 1. DASHBOARD LOGIC (Only runs if user is logged in)
+  // ---------------------------------------------------------
   useEffect(() => {
     const fetchSnippets = async () => {
       if (user) {
         try {
-          // Fetch snippets belonging to THIS user
-          const res = await axios.get("http://localhost:8800/api/snippets/" + user._id);
+          const res = await api.get("/snippets/" + user._id);
           setSnippets(res.data);
         } catch (err) {
-          console.log(err);
+          console.log("Error fetching projects:", err);
         }
       }
     };
     fetchSnippets();
   }, [user]);
 
-
+  const handleLogout = () => {
+    localStorage.removeItem("user");
+    window.location.href = "/"; 
+  };
 
   const handleDelete = async (id) => {
-    // 1. Ask for confirmation (optional but good practice)
-    const sure = window.confirm("Are you sure you want to delete this snippet?");
-    if (!sure) return;
-
+    if (!window.confirm("Are you sure you want to delete this project?")) return;
     try {
-      // 2. Tell Backend to delete it
-      await axios.delete("http://localhost:8800/api/snippets/" + id);
-      
-      // 3. Remove it from the screen immediately (so you don't have to refresh)
+      await api.delete("/snippets/" + id);
       setSnippets(snippets.filter((s) => s._id !== id));
-      
     } catch (err) {
       console.log(err);
-      alert("Failed to delete snippet");
     }
   };
 
+  const getPreviewHtml = (files) => {
+    if (!files || files.length === 0) return "<div style='color:#555; text-align:center; padding-top:40px; font-family:sans-serif'>Empty Project</div>";
+    let htmlFile = files.find(f => f.name === "index.html") || files.find(f => f.name.endsWith(".html"));
+    if (!htmlFile) return "<div style='color:#555; text-align:center; padding-top:40px; font-family:sans-serif'>No HTML Found</div>";
 
+    let html = htmlFile.value;
+    const cssFiles = files.filter(f => f.language === "css");
+    cssFiles.forEach(css => {
+        const linkRegex = new RegExp(`<link[^>]+href=['"]${css.name}['"][^>]*>`, 'g');
+        if (html.match(linkRegex)) html = html.replace(linkRegex, `<style>${css.value}</style>`);
+    });
+    return html;
+  };
 
-  // 1. If NOT logged in, show the Welcome Screen
+  // ---------------------------------------------------------
+  // 2. LANDING PAGE (Shown when NO user is logged in)
+  // ---------------------------------------------------------
   if (!user) {
     return (
-        <div style={{textAlign: "center", marginTop: "100px"}}>
-            <h1>Welcome to CodeStash</h1>
-            <p>Store, organize, and retrieve your code snippets instantly.</p>
-            <div style={{marginTop: "20px"}}>
-                <Link to="/login" style={{marginRight:"20px", color:"blue"}}>Login</Link>
-                <Link to="/register" style={{color:"blue"}}>Register</Link>
-            </div>
+        <div style={{ minHeight: "100vh", backgroundColor: "#0f0f0f", color: "white", fontFamily: "'Segoe UI', sans-serif" }}>
+            
+            {/* HERO SECTION */}
+            <header style={{ 
+                height: "500px", 
+                display: "flex", 
+                flexDirection: "column", 
+                alignItems: "center", 
+                justifyContent: "center", 
+                background: "linear-gradient(180deg, #1e1e2f 0%, #0f0f0f 100%)",
+                textAlign: "center",
+                padding: "20px"
+            }}>
+                <h1 style={{ fontSize: "3.5rem", fontWeight: "800", marginBottom: "10px", background: "-webkit-linear-gradient(45deg, #007acc, #00d4ff)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                    CodeStash
+                </h1>
+                <p style={{ fontSize: "1.2rem", color: "#aaa", maxWidth: "600px", marginBottom: "30px", lineHeight: "1.6" }}>
+                    An online code editor for building, testing, and sharing HTML, CSS, and JS projects instantly in your browser.
+                </p>
+                <div style={{ display: "flex", gap: "20px" }}>
+                    <Link to="/login">
+                        <button style={{ padding: "12px 30px", fontSize: "16px", backgroundColor: "#007acc", color: "white", border: "none", borderRadius: "6px", cursor: "pointer", fontWeight: "bold", boxShadow: "0 4px 15px rgba(0, 122, 204, 0.4)" }}>
+                            Login
+                        </button>
+                    </Link>
+                    <Link to="/register">
+                        <button style={{ padding: "12px 30px", fontSize: "16px", backgroundColor: "transparent", color: "#007acc", border: "2px solid #007acc", borderRadius: "6px", cursor: "pointer", fontWeight: "bold" }}>
+                            Get Started
+                        </button>
+                    </Link>
+                </div>
+            </header>
+
+            {/* "HOW IT WORKS" SECTION */}
+            <section style={{ padding: "60px 20px", maxWidth: "1000px", margin: "0 auto" }}>
+                <h2 style={{ textAlign: "center", marginBottom: "50px", fontSize: "2rem" }}>How It Works</h2>
+                
+                <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "40px" }}>
+                    
+                    {/* STEP 1 */}
+                    <div style={{ flex: "1", minWidth: "250px", backgroundColor: "#1e1e1e", padding: "30px", borderRadius: "10px", border: "1px solid #333" }}>
+                        <div style={{ fontSize: "40px", marginBottom: "15px" }}>📂</div>
+                        <h3 style={{ color: "#007acc" }}>1. Create Project</h3>
+                        <p style={{ color: "#ccc", lineHeight: "1.5" }}>Start a new project with a single click. We set up the basic HTML, CSS, and JS files for you automatically.</p>
+                    </div>
+
+                    {/* STEP 2 */}
+                    <div style={{ flex: "1", minWidth: "250px", backgroundColor: "#1e1e1e", padding: "30px", borderRadius: "10px", border: "1px solid #333" }}>
+                        <div style={{ fontSize: "40px", marginBottom: "15px" }}>✍️</div>
+                        <h3 style={{ color: "#e6a23c" }}>2. Write Code</h3>
+                        <p style={{ color: "#ccc", lineHeight: "1.5" }}>Use our powerful code editor with syntax highlighting. Edit multiple files side-by-side.</p>
+                    </div>
+
+                    {/* STEP 3 */}
+                    <div style={{ flex: "1", minWidth: "250px", backgroundColor: "#1e1e1e", padding: "30px", borderRadius: "10px", border: "1px solid #333" }}>
+                        <div style={{ fontSize: "40px", marginBottom: "15px" }}>🚀</div>
+                        <h3 style={{ color: "#28a745" }}>3. Live Preview</h3>
+                        <p style={{ color: "#ccc", lineHeight: "1.5" }}>See your changes instantly in the built-in browser preview. No refresh needed.</p>
+                    </div>
+
+                </div>
+            </section>
+
+            {/* FOOTER */}
+            <footer style={{ textAlign: "center", padding: "40px", color: "#555", fontSize: "14px", borderTop: "1px solid #222", marginTop: "40px" }}>
+                &copy; {new Date().getFullYear()} CodeStash. Build something amazing.
+            </footer>
         </div>
     );
   }
 
-  // 2. If Logged in, show the Dashboard
+  // ---------------------------------------------------------
+  // 3. DASHBOARD UI (Shown when USER IS LOGGED IN)
+  // ---------------------------------------------------------
   return (
-    <div style={{ maxWidth: "1000px", margin: "0 auto", padding: "20px" }}>
-      <div style={{display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "30px"}}>
-          <h2>My Snippets</h2>
-          <Link to="/create">
-            <button style={{padding: "10px 20px", backgroundColor: "teal", color: "white", border: "none", borderRadius: "5px", cursor: "pointer"}}>
-                + New Snippet
-            </button>
-          </Link>
-      </div>
+    <div style={{ minHeight: "100vh", backgroundColor: "#1e1e1e", color: "#e0e0e0", fontFamily: "'Segoe UI', sans-serif" }}>
+      
+      {/* NAVBAR */}
+      <nav style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0 30px", height: "60px", backgroundColor: "#252526", borderBottom: "1px solid #333", boxShadow: "0 2px 10px rgba(0,0,0,0.3)" }}>
+          <div style={{ fontSize: "20px", fontWeight: "bold", color: "#007acc" }}>⚡ CodeStash</div>
+          <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+             <span style={{ color: "#aaa", fontSize: "14px" }}>Welcome, <strong style={{ color: "white" }}>{user.username}</strong></span>
+             <button onClick={handleLogout} style={{ padding: "8px 16px", backgroundColor: "#d9534f", color: "white", border: "none", borderRadius: "4px", cursor: "pointer", fontWeight: "600" }}>Logout</button>
+          </div>
+      </nav>
 
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: "20px" }}>
-        
-        {/* Loop through snippets and create a card for each */}
-        {snippets.map((s) => (
-            <div key={s._id} style={{ border: "1px solid #ddd", borderRadius: "10px", padding: "20px", boxShadow: "0 4px 8px rgba(0,0,0,0.1)", backgroundColor: "white" }}>
-                <h3 style={{margin: "0 0 10px 0", color: "#333"}}>{s.title}</h3>
-                <span style={{backgroundColor: "#eee", padding: "2px 8px", borderRadius: "4px", fontSize: "12px", color: "#555"}}>{s.language}</span>
-                
-                <div style={{ marginTop: "15px", backgroundColor: "#282c34", color: "white", padding: "10px", borderRadius: "5px", fontSize: "12px", height: "100px", overflow: "hidden", fontFamily: "monospace" }}>
-                    {s.code.substring(0, 100)}... {/* Show only first 100 chars */}
+      {/* CONTENT */}
+      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "40px 20px" }}>
+         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "30px" }}>
+            <h2 style={{ margin: 0, fontSize: "24px" }}>My Projects</h2>
+            <Link to="/create">
+                <button style={{ padding: "10px 20px", backgroundColor: "#007acc", color: "white", border: "none", borderRadius: "4px", cursor: "pointer", fontWeight: "bold", boxShadow: "0 4px 6px rgba(0,0,0,0.2)" }}>+ New Project</button>
+            </Link>
+         </div>
+
+         <input type="text" placeholder="🔍 Search projects..." value={query} onChange={(e) => setQuery(e.target.value)} style={{ width: "100%", padding: "14px", marginBottom: "40px", backgroundColor: "#2d2d2d", border: "1px solid #444", borderRadius: "6px", fontSize: "16px", color: "white", outline: "none" }} />
+
+         {/* GRID */}
+         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: "25px" }}>
+            {snippets
+            .filter((s) => (s.title || "Untitled").toLowerCase().includes(query.toLowerCase()))
+            .map((s) => (
+                <div key={s._id} style={{ backgroundColor: "#252526", border: "1px solid #333", borderRadius: "8px", overflow: "hidden", display: "flex", flexDirection: "column", boxShadow: "0 4px 10px rgba(0,0,0,0.2)", transition: "transform 0.2s" }}>
+                    <div style={{ height: "150px", backgroundColor: "white", position: "relative", borderBottom: "1px solid #333", overflow: "hidden" }}>
+                        <div style={{position: "absolute", inset:0, zIndex:10}}></div>
+                        <iframe srcDoc={getPreviewHtml(s.files)} title="preview" style={{ width: "200%", height: "200%", border: "none", transform: "scale(0.5)", transformOrigin: "0 0" }} scrolling="no" />
+                    </div>
+                    <div style={{ padding: "15px", flexGrow: 1, display: "flex", flexDirection: "column" }}>
+                        <h3 style={{ margin: "0 0 5px 0", fontSize: "16px", color: "#fff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{s.title || "Untitled"}</h3>
+                        <p style={{ margin: "0 0 15px 0", fontSize: "12px", color: "#888" }}>{s.files ? s.files.length : 0} files • {new Date(s.updatedAt || Date.now()).toLocaleDateString()}</p>
+                        <div style={{ marginTop: "auto", display: "flex", gap: "10px" }}>
+                            <Link to={`/edit/${s._id}`} style={{ flex: 1, textDecoration: "none" }}><button style={{ width: "100%", padding: "8px", backgroundColor: "#0e639c", color: "white", border: "none", borderRadius: "3px", cursor: "pointer", fontWeight: "600" }}>Open</button></Link>
+                            <button onClick={() => handleDelete(s._id)} style={{ padding: "8px 12px", backgroundColor: "#3a3a3a", color: "#ff6b6b", border: "1px solid #555", borderRadius: "3px", cursor: "pointer" }}>🗑</button>
+                        </div>
+                    </div>
                 </div>
-
-                <div style={{marginTop: "15px", display: "flex", justifyContent: "space-between"}}>
-                   <button 
-                      onClick={() => handleDelete(s._id)} 
-                      style={{color: "red", border: "none", background: "none", cursor: "pointer"}}>Delete
-                    </button>
-                    <Link to={`/edit/${s._id}`}>
-                    <button style={{color: "green", border: "none", background: "none", cursor: "pointer"}}>
-                      Edit
-                    </button>
-                    </Link>
-                   <Link to={`/snippet/${s._id}`}>
-                      <button style={{color: "blue", border: "none", background: "none", cursor: "pointer"}}>View Full
-                      </button>
-                  </Link>
-                </div>
-            </div>
-        ))}
-
-        {snippets.length === 0 && <p>No snippets found. Create one!</p>}
+            ))}
+         </div>
+         {snippets.length === 0 && <div style={{ textAlign: "center", marginTop: "50px", color: "#666" }}><p>No projects found. Start by creating one!</p></div>}
       </div>
     </div>
   );

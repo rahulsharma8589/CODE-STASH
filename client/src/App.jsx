@@ -15,11 +15,11 @@ function App() {
   }
   return (
     <BrowserRouter>
-      {/* Navigation Bar */}
-      <nav style={{padding: "20px", backgroundColor: "#333", color: "white", marginBottom: "20px"}}>
+      
+      {/* <nav style={{padding: "20px", backgroundColor: "#333", color: "white", marginBottom: "20px"}}>
         <Link to="/" style={{marginRight:"20px", color:"white", textDecoration:"none", fontWeight:"bold"}}>CodeStash</Link>
         <div>
-            {/* If user is logged in, show their name and Logout. If not, show Register/Login */}
+          
             {user ? (
               <>
                 <Link to="/create" style={{marginRight: "20px", color: "white", backgroundColor: "green", padding: "10px", borderRadius: "5px", textDecoration: "none"}}>+ New Snippet</Link>
@@ -35,7 +35,7 @@ function App() {
             )}
         </div>
 
-      </nav>
+      </nav> */}
 
       <Routes>
         <Route path="/" element={<Home />} />
